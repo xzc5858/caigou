@@ -1,69 +1,85 @@
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation
-from keras.optimizers import SGD
-from keras.datasets import mnist
-import numpy
-'''
-    第一步：选择模型
-'''
-model = Sequential()
-'''
-   第二步：构建网络层
-'''
-model.add(Dense(500,input_shape=(784,))) # 输入层，28*28=784
-model.add(Activation('tanh')) # 激活函数是tanh
-model.add(Dropout(0.5)) # 采用50%的dropout
+from tornado.ioloop import IOLoop
+from tornado.options import define, options
+from tornado.web import RequestHandler
+import tornado.template
+import sys
 
-model.add(Dense(500)) # 隐藏层节点500个
-model.add(Activation('tanh'))
-model.add(Dropout(0.5))
+define("port", default=8888, type=int, help="run on the given port")
+define("domain", default=[], type=str, help="run on the given domain", multiple=True)
+# define("static_path", default="/statics", type=str)
+settings = {
+    'template_path': 'Templates',  # html文件
+    'static_path': 'statics',  # 静态文件（css,js,img）
+    'static_url_prefix': '/statics/',  # 静态文件前缀
+    'cookie_secret': 'suoning',  # cookie自定义字符串加盐
+    # 'xsrf_cookies': True,          # 防止跨站伪造
+    # 'ui_methods': mt,              # 自定义UIMethod函数
+    # 'ui_modules': md,              # 自定义UIModule类
+}
 
-model.add(Dense(10)) # 输出结果是10个类别，所以维度是10
-model.add(Activation('softmax')) # 最后一层用softmax作为激活函数
 
-'''
-   第三步：编译
-'''
-# 优化函数，设定学习率（lr）等参数
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-model.compile(loss='categorical_crossentropy', optimizer=sgd)
-# model.compile(loss='mean_squared_error', optimizer=sgd)
-# The test loss is 0.009208 The accuracy of the model is 0.940800
-# model.compile(loss='categorical_crossentropy', optimizer=sgd, class_mode='categorical') # 使用交叉熵作为loss函数
-# model.compile(loss=losses.mean_squared_error, optimizer='sgd')
-'''
-   第四步：训练
-   .fit的一些参数
-   batch_size：对总的样本数进行分组，每组包含的样本数量
-   epochs ：训练次数
-   shuffle：是否把数据随机打乱之后再进行训练
-   validation_split：拿出百分之多少用来做交叉验证
-   verbose：屏显模式 0：不输出  1：输出进度  2：输出每次的训练结果
-'''
-# (X_train, y_train), (X_test, y_test) = mnist.load_data() # 使用Keras自带的mnist工具读取数据（第一次需要联网）
-# # 由于mist的输入数据维度是(num, 28, 28)，这里需要把后面的维度直接拼起来变成784维
-X_train = X_train.reshape(X_train.shape[0], X_train.shape[1] * X_train.shape[2])
-X_test = X_test.reshape(X_test.shape[0], X_test.shape[1] * X_test.shape[2])
-Y_train = (numpy.arange(10) == y_train[:, None]).astype(int)
-Y_test = (numpy.arange(10) == y_test[:, None]).astype(int)
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        import os
+        scriptPath = os.path.split(os.path.realpath(sys.argv[0]))[0]
+        ls = open(scriptPath + '/list.txt', 'r', encoding="utf-8")
+        myls = ls.read()
+        self.render("index.html", list_info=myls.split('\n'))
 
-model.fit(X_train,Y_train,batch_size=200,epochs=50,shuffle=True,verbose=0,validation_split=0.3)
-model.evaluate(X_test, Y_test, batch_size=200, verbose=0)
+    def post(self):
+        import os
+        scriptPath = os.path.split(os.path.realpath(sys.argv[0]))[0]
+        ls = open(scriptPath + '/list.txt', 'a++', encoding="utf-8")
+        myls = ls.read()
+        self.render("index.html", list_info=myls.split('\n'))
 
-'''
-    第五步：输出
-'''
-print("test set")
-scores = model.evaluate(X_test,Y_test,batch_size=200,verbose=0)
-print("")
-print("The test loss is %f" % scores)
-result = model.predict(X_test,batch_size=200,verbose=0)
 
-result_max = numpy.argmax(result, axis = 1)
-test_max = numpy.argmax(Y_test, axis = 1)
+class ListHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write('sfds')
+        # loader = tornado.template.Loader("/Templates")
+        # loader.load('./templates/list.html', '/index.html')
+        # self.write("how are you")
 
-result_bool = numpy.equal(result_max, test_max)
-true_num = numpy.sum(result_bool)
-print("")
-print("The accuracy of the model is %f" % (true_num/len(result_bool)))
 
+class AdminHandler(RequestHandler):
+    def get_login_url(self):
+        return '/login'
+
+
+class LoginHandler(RequestHandler):
+    def get(self):
+        if self.get_current_user():
+            self.redirect('/')
+            return
+        self.render('login.html')
+
+    # def post(self):
+    #     if self.get_current_user():
+    #         raise tornado.web.HTTPError(403)
+    # check username and password
+    # if success:
+    #     self.redirect(self.get_argument('next', '/'))
+
+
+class ChartsHandler(RequestHandler):
+    def get(self):
+        self.render('charts.html')
+
+
+Handlers = [("/", MainHandler), ("/list", ListHandler), ("/charts", ChartsHandler)]
+
+if __name__ == '__main__':
+    # tornado.options.parse_command_line()  # 如果命令行没有传值，则使用默认值
+    # tornado.options.parse_config_file("./config")  # 引用config文件里面的值，文件内容：port=8006
+    # print(tornado.options.options.port)
+    # ccgpsx = ccpgsx_spider()
+    # ccgpsx.show_list()
+    # app = tornado.web.Application(Handlers, login_url='/login', **settings)
+    # app.listen(options.port)
+    # IOLoop.current().start()
+    # sockets = tornado.netutil.bind_sockets(options.port)
+    # tornado.process.fork_processes(9)
+    # server = HTTPServer(Handlers)
+    # server.add_sockets(sockets)
+    # IOLoop.current().start()

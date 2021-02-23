@@ -1,0 +1,329 @@
+<!doctype html>
+<html class="no-js fixed-layout">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>徐志成大数据实验室</title>
+    <meta name="description" content="这是一个 index 页面">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="statics/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="statics/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="Amaze UI"/>
+    <link rel="stylesheet" href="statics/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="statics/css/admin.css">
+    <script src="statics/dist/echarts.js"></script>
+
+    <script src="statics/lib/esl.js"></script>
+    <script src="statics/lib/config.js"></script>
+    <script src="statics/lib/jquery.min.js"></script>
+    <script src="statics/lib/facePrint.js"></script>
+    <script src="statics/lib/testHelper.js"></script>
+    <script src="statics/data/map/js/china.js"></script>
+    <!-- <script src="ut/lib/canteen.js"></script> -->
+    <!--    <link rel="stylesheet" href="statics/lib/reset.css"/>-->
+</head>
+<body>
+<header class="am-topbar am-topbar-inverse am-g">
+    <div class="am-topbar-brand">
+        <strong>徐志成</strong> <small>大数据实验室</small>
+    </div>
+
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only"
+            data-am-collapse="{target: '#topbar-collapse'}"><span class="am-sr-only">导航切换</span> <span
+            class="am-icon-bars"></span></button>
+
+    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
+
+        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
+
+            <li class="am-hide-sm-only"><a href="javascript:;" id="admin-fullscreen"><span
+                    class="am-icon-arrows-alt"></span> <span class="admin-fullText">开启全屏</span></a></li>
+        </ul>
+    </div>
+</header>
+<div class="am-content">
+    <div class="am-g">
+        <div id="main" class="am-u-md-4" style="height:300px;">
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart = echarts.init(document.getElementById('main'));
+
+                // 指定图表的配置项和数据
+                var option = {
+                    title: {
+                        text: 'ECharts 入门示例'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['销量']
+                    },
+                    xAxis: {
+                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            </script>
+        </div>
+        <div id="main1" class="am-u-md-4" style="height:300px;">
+            <script>
+                function createChart(echarts, domOrId, option, opt) {
+                    if (typeof opt === 'number') {
+                        opt = {height: opt};
+                    } else {
+                        opt = opt || {};
+                    }
+
+                    var dom = getDom(domOrId);
+
+                    if (dom) {
+                        if (opt.width != null) {
+                            dom.style.width = opt.width + 'px';
+                        }
+                        if (opt.height != null) {
+                            dom.style.height = opt.height + 'px';
+                        }
+
+                        var chart = echarts.init(dom);
+
+                        if (opt.draggable) {
+                            if (!window.draggable) {
+                                throw new Error(
+                                    'Pleasse add the script in HTML: \n'
+                                );
+                            }
+                            window.draggable.init(dom, chart, {throttle: 70});
+                        }
+
+                        option && chart.setOption(option, {
+                            lazyUpdate: opt.lazyUpdate,
+                            notMerge: opt.notMerge
+                        });
+
+                        var isAutoResize = opt.autoResize == null ? true : opt.autoResize;
+                        if (isAutoResize) {
+                            testHelper.resizable(chart);
+                        }
+
+                        return chart;
+                    }
+                };
+                var chart1;
+
+                require([
+                    'echarts'
+                ], function (echarts) {
+
+                    require(['statics/map/js/china'], function () {
+
+                        option1 = {
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{b}'
+                            },
+                            legend: {
+                                top: 0,
+                                left: 'center',
+                                data: ['中国A', '中国B']
+                            },
+                            series: [
+                                {
+                                    name: '中国A',
+                                    type: 'map',
+                                    mapType: 'china',
+                                    selectedMode: 'multiple',
+                                    label: {
+                                        normal: {
+                                            show: true
+                                        },
+                                        emphasis: {
+                                            show: true
+                                        }
+                                    },
+                                    roam: true,
+                                    nameMap: {
+                                        '广东': 'guangdong',
+                                        '广西': 'guangxi'
+                                    },
+                                    data: [
+                                        {name: '广东', selected: true}
+                                    ]
+                                },
+                                {
+                                    name: '中国B',
+                                    type: 'map',
+                                    mapType: 'china',
+                                    selectedMode: 'multiple',
+                                    label: {
+                                        normal: {
+                                            show: true
+                                        },
+                                        emphasis: {
+                                            show: true
+                                        }
+                                    },
+                                    roam: true,
+                                    // nameMap: {
+                                    //     '广东': 'guangdong',
+                                    //     '广西': 'guangxi'
+                                    // },
+                                    data: [
+                                        {name: '广东', selected: true},
+                                        {name: '山东', selected: true}
+                                    ]
+                                }
+                            ]
+                        };
+
+                        chart1 = createChart(echarts, 'main1', option1);
+
+                    });
+
+                });
+
+                function setOption() {
+                    chart.setOption({
+                        series: {
+                            label: {
+                                normal: {
+                                    color: 'red'
+                                }
+                            }
+                        }
+                    });
+                }
+
+
+            </script>
+        </div>
+        <div id="main2" class="am-u-md-4" style="height:300px;">
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart2 = echarts.init(document.getElementById('main2'));
+
+                // 指定图表的配置项和数据
+                var option2 = {
+                    title: {
+                        text: 'ECharts 入门示例'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['销量']
+                    },
+                    xAxis: {
+                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart2.setOption(option2);
+            </script>
+        </div>
+    </div>
+    <div class="am-g">
+        <div id="main3" class="am-u-md-4" style="height:300px;">
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart3 = echarts.init(document.getElementById('main3'));
+
+                // 指定图表的配置项和数据
+                var option3 = {
+                    title: {
+                        text: 'ECharts 入门示例'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['销量']
+                    },
+                    xAxis: {
+                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart3.setOption(option3);
+            </script>
+        </div>
+        <div id="main4" class="am-u-md-4" style="height:300px;">
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart4 = echarts.init(document.getElementById('main4'));
+
+                // 指定图表的配置项和数据
+                var option4 = {
+                    title: {
+                        text: 'ECharts 入门示例'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['销量']
+                    },
+                    xAxis: {
+                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart4.setOption(option4);
+            </script>
+        </div>
+        <div id="main5" class="am-u-md-4" style="height:300px;">
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart5 = echarts.init(document.getElementById('main5'));
+
+                // 指定图表的配置项和数据
+                var option5 = {
+                    title: {
+                        text: 'ECharts 入门示例'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['销量']
+                    },
+                    xAxis: {
+                        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart5.setOption(option5);
+            </script>
+        </div>
+    </div>
+</div>
+</body>
+</html>
